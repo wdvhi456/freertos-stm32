@@ -1,7 +1,7 @@
 ..\obj\port.o: ..\FreeRTOS\portable\RVDS\ARM_CM3\port.c
 ..\obj\port.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\port.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\port.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\port.o: E:\MDK\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\port.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\port.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\port.o: ..\SYSTEM\sys\sys.h
 ..\obj\port.o: ..\USER\stm32f10x.h
@@ -33,7 +33,7 @@
 ..\obj\port.o: ..\STM32F10x_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\port.o: ..\STM32F10x_FWLib\inc\misc.h
 ..\obj\port.o: ..\SYSTEM\usart\usart.h
-..\obj\port.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\port.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\port.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\port.o: ..\FreeRTOS\include\portable.h
 ..\obj\port.o: ..\FreeRTOS\include\deprecated_definitions.h

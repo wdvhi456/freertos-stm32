@@ -1,9 +1,9 @@
 ..\obj\queue.o: ..\FreeRTOS\queue.c
-..\obj\queue.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\queue.o: E:\MDK514\ARM\ARMCC\Bin\..\include\string.h
+..\obj\queue.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\queue.o: E:\MDK\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\queue.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\queue.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\queue.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\queue.o: E:\MDK\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\queue.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\queue.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\queue.o: ..\SYSTEM\sys\sys.h
 ..\obj\queue.o: ..\USER\stm32f10x.h
@@ -35,7 +35,7 @@
 ..\obj\queue.o: ..\STM32F10x_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\queue.o: ..\STM32F10x_FWLib\inc\misc.h
 ..\obj\queue.o: ..\SYSTEM\usart\usart.h
-..\obj\queue.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\queue.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\queue.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\queue.o: ..\FreeRTOS\include\portable.h
 ..\obj\queue.o: ..\FreeRTOS\include\deprecated_definitions.h

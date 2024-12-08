@@ -2167,7 +2167,7 @@ Image Symbol Table
     HardFault_Handler                        0x08000b5d   Thumb Code     2  stm32f10x_it.o(i.HardFault_Handler)
     Initialize_EDF_Tasks                     0x08000b61   Thumb Code    70  main.o(i.Initialize_EDF_Tasks)
     Initialize_Round_Robin_Tasks             0x08000bb1   Thumb Code    70  main.o(i.Initialize_Round_Robin_Tasks)
-    Initialize_Weight_Round_Robin_Tasks      0x08000c05   Thumb Code    70  main.o(i.Initialize_Weight_Round_Robin_Tasks)
+    Initialize_Weight_Round_Robin_Tasks      0x08000c05   Thumb Code    68  main.o(i.Initialize_Weight_Round_Robin_Tasks)
     LCD_Clear                                0x08000c59   Thumb Code    40  lcd.o(i.LCD_Clear)
     LCD_Display_Dir                          0x08000c89   Thumb Code   180  lcd.o(i.LCD_Display_Dir)
     LCD_DrawLine                             0x08000d41   Thumb Code   150  lcd.o(i.LCD_DrawLine)
@@ -2596,32 +2596,32 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       200         20          0          4          0       2261   delay.o
+       200         20          0          4          0       2265   delay.o
          0          0          0          0          0      10328   event_groups.o
-       584        138          0         24      20480       3647   heap_4.o
-      9508        164       6080          4         14      51124   lcd.o
-        80         10          0          0          0        503   led.o
-       136          0          0          0          0       2814   list.o
-      2790        852          0         28        320     281224   main.o
+       584        138          0         24      20480       3651   heap_4.o
+      9508        164       6080          4         14      51132   lcd.o
+        80         10          0          0          0        507   led.o
+       136          0          0          0          0       2810   list.o
+      2790        854          0         28        320     281244   main.o
        144         16          0          0          0       1949   misc.o
-       842        312          0         12          0       9981   port.o
+       842        312          0         12          0       9989   port.o
       1900        272          0          0         64      11558   queue.o
-        64         26        304          0       1536        796   startup_stm32f10x_hd.o
+        64         26        304          0       1536        804   startup_stm32f10x_hd.o
        232          6          0          0          0       1801   stm32f10x_fsmc.o
-       160          0          0          0          0       2255   stm32f10x_gpio.o
-        12          0          0          0          0       2457   stm32f10x_it.o
-       196         28          0         20          0       4337   stm32f10x_rcc.o
-        30          0          0          0          0       2449   stm32f10x_tim.o
-       310          6          0          0          0       4586   stm32f10x_usart.o
+       160          0          0          0          0       2259   stm32f10x_gpio.o
+        12          0          0          0          0       2461   stm32f10x_it.o
+       196         28          0         20          0       4345   stm32f10x_rcc.o
+        30          0          0          0          0       2453   stm32f10x_tim.o
+       310          6          0          0          0       4598   stm32f10x_usart.o
          0          0          0          0          0         32   sys.o
-       248         24          0         20          0       1713   system_stm32f10x.o
-      3006        760          0         60        740      28538   tasks.o
+       248         24          0         20          0       1725   system_stm32f10x.o
+      3006        760          0         60        740      28570   tasks.o
        120         52          0          0          0        972   timer.o
-      1144        260          0         20         40       8530   timers.o
-       286         26          0          6        200       4028   usart.o
+      1144        260          0         20         40       8558   timers.o
+       286         26          0          6        200       4024   usart.o
 
     ----------------------------------------------------------------------
-     22016       2972       6416        200      23396     437883   Object Totals
+     22016       2974       6416        200      23396     438035   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         24          0          0          2          2          0   (incl. Padding)
 
@@ -2699,9 +2699,9 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     24128       3044       6456        200      23496     432255   Grand Totals
-     24128       3044       6456        200      23496     432255   ELF Image Totals
-     24128       3044       6456        200          0          0   ROM Totals
+     24128       3046       6456        200      23496     432407   Grand Totals
+     24128       3046       6456        200      23496     432407   ELF Image Totals
+     24128       3046       6456        200          0          0   ROM Totals
 
 ==============================================================================
 

@@ -350,7 +350,7 @@ void Initialize_EDF_Tasks(void) {
 	current_task_count = 3;	//总任务数
 
 	tasks[0].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[0].execution_time = 3*TIME_SLICE_INTERVAL;
+	tasks[0].execution_time = 30*TIME_SLICE_INTERVAL;
 	tasks[0].period = 10*TIME_SLICE_INTERVAL;
 	tasks[0].deadline = 10*TIME_SLICE_INTERVAL;
 	tasks[0].ID = 1;
@@ -358,7 +358,7 @@ void Initialize_EDF_Tasks(void) {
 //		LCD_ShowxNum(400,100,tasks[0].execution_time,8,16,0x80);
 
 	tasks[1].arrival_time = 2*TIME_SLICE_INTERVAL;
-	tasks[1].execution_time = 3*TIME_SLICE_INTERVAL;
+	tasks[1].execution_time = 30*TIME_SLICE_INTERVAL;
 	tasks[1].period = 10*TIME_SLICE_INTERVAL;
 	tasks[1].deadline = 14*TIME_SLICE_INTERVAL;
 	tasks[1].ID = 2;
@@ -406,17 +406,17 @@ void Initialize_Weight_Round_Robin_Tasks(void){
 	}
 	
 	tasks[0].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[0].execution_time = 4*TIME_SLICE_INTERVAL;
+	tasks[0].execution_time = 40*TIME_SLICE_INTERVAL;
 	tasks[0].weight = 1;
 	tasks[0].ID = 1;
 
 	tasks[1].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[1].execution_time = 5*TIME_SLICE_INTERVAL;
+	tasks[1].execution_time = 50*TIME_SLICE_INTERVAL;
 	tasks[1].weight = 2;
 	tasks[1].ID = 2;
 
 	tasks[2].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[2].execution_time = 8*TIME_SLICE_INTERVAL;
+	tasks[2].execution_time = 80*TIME_SLICE_INTERVAL;
 	tasks[2].weight = 3;
 	tasks[2].ID = 3;
 }
@@ -436,7 +436,7 @@ int main(void)
 	LCD_ShowString(30,10,300,48,24,"RTOS TEST");
 	
 	//选择调度策略: 1-5分别为抢占式优先级调度，抢占式EDF调度，Round-Robin调度，Weight-Round-Robin调度，MLFQ调度
-	scheduling_id = 3;
+	scheduling_id = 2;
 	
 	xTaskCreate(TASK_1, "Task1", configMINIMAL_STACK_SIZE, NULL, TASK1_PRIORITY, &tasks[0].task_handle);
 	xTaskCreate(TASK_2, "Task2", configMINIMAL_STACK_SIZE, NULL, TASK2_PRIORITY, &tasks[1].task_handle);

@@ -2542,32 +2542,32 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       200         20          0          4          0       2261   delay.o
-         0          0          0          0          0      10328   event_groups.o
-       584        138          0         24      20480       3647   heap_4.o
-      9508        164       6080          4         14      51124   lcd.o
+       200         20          0          4          0       2249   delay.o
+         0          0          0          0          0      10320   event_groups.o
+       584        138          0         24      20480       3631   heap_4.o
+      9508        164       6080          4         14      51068   lcd.o
         80         10          0          0          0        503   led.o
-       136          0          0          0          0       2814   list.o
-       920        196          0         20        280     278132   main.o
-       144         16          0          0          0       1949   misc.o
-       842        312          0         12          0       9981   port.o
-      1832        236          0          0         64      11025   queue.o
-        64         26        304          0       1536        796   startup_stm32f10x_hd.o
-       232          6          0          0          0       1801   stm32f10x_fsmc.o
-       160          0          0          0          0       2255   stm32f10x_gpio.o
-        12          0          0          0          0       2457   stm32f10x_it.o
-       196         28          0         20          0       4337   stm32f10x_rcc.o
-        30          0          0          0          0       2449   stm32f10x_tim.o
+       136          0          0          0          0       2790   list.o
+       920        196          0         20        280     278080   main.o
+       144         16          0          0          0       1933   misc.o
+       842        312          0         12          0       9961   port.o
+      1832        236          0          0         64      10985   queue.o
+        64         26        304          0       1536        800   startup_stm32f10x_hd.o
+       232          6          0          0          0       1797   stm32f10x_fsmc.o
+       160          0          0          0          0       2247   stm32f10x_gpio.o
+        12          0          0          0          0       2441   stm32f10x_it.o
+       196         28          0         20          0       4329   stm32f10x_rcc.o
+        30          0          0          0          0       2441   stm32f10x_tim.o
        310          6          0          0          0       4586   stm32f10x_usart.o
          0          0          0          0          0         32   sys.o
        248         24          0         20          0       1713   system_stm32f10x.o
-      3006        760          0         60        740      28538   tasks.o
+      3006        760          0         60        740      28466   tasks.o
        120         52          0          0          0        972   timer.o
-      1144        260          0         20         40       8530   timers.o
-       286         26          0          6        200       4028   usart.o
+      1144        260          0         20         40       8506   timers.o
+       286         26          0          6        200       4008   usart.o
 
     ----------------------------------------------------------------------
-     20072       2280       6416        192      23356     434258   Object Totals
+     20072       2280       6416        192      23356     433858   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         18          0          0          2          2          0   (incl. Padding)
 
@@ -2644,8 +2644,8 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     22176       2352       6456        192      23456     428890   Grand Totals
-     22176       2352       6456        192      23456     428890   ELF Image Totals
+     22176       2352       6456        192      23456     428490   Grand Totals
+     22176       2352       6456        192      23456     428490   ELF Image Totals
      22176       2352       6456        192          0          0   ROM Totals
 
 ==============================================================================

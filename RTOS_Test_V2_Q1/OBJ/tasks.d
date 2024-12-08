@@ -1,9 +1,9 @@
 ..\obj\tasks.o: ..\FreeRTOS\tasks.c
-..\obj\tasks.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
-..\obj\tasks.o: E:\MDK514\ARM\ARMCC\Bin\..\include\string.h
+..\obj\tasks.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdlib.h
+..\obj\tasks.o: E:\MDK\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\tasks.o: ..\FreeRTOS\include\FreeRTOS.h
-..\obj\tasks.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\tasks.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\tasks.o: E:\MDK\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\tasks.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\tasks.o: ..\FreeRTOS\include\FreeRTOSConfig.h
 ..\obj\tasks.o: ..\SYSTEM\sys\sys.h
 ..\obj\tasks.o: ..\USER\stm32f10x.h
@@ -35,7 +35,7 @@
 ..\obj\tasks.o: ..\STM32F10x_FWLib\inc\stm32f10x_wwdg.h
 ..\obj\tasks.o: ..\STM32F10x_FWLib\inc\misc.h
 ..\obj\tasks.o: ..\SYSTEM\usart\usart.h
-..\obj\tasks.o: E:\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\tasks.o: E:\MDK\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\tasks.o: ..\FreeRTOS\include\projdefs.h
 ..\obj\tasks.o: ..\FreeRTOS\include\portable.h
 ..\obj\tasks.o: ..\FreeRTOS\include\deprecated_definitions.h
