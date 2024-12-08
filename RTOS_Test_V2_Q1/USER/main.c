@@ -26,7 +26,6 @@ typedef struct{
 	uint32_t weight;	//时间片权重
 	TaskHandle_t task_handle;	//句柄
 }Task_Control_Block;
-
 Task_Control_Block tasks[MAX_TASKS];	//设置最大TCB数量，即最大可调度任务数
 
 //定义全局变量
@@ -63,6 +62,188 @@ void Initialize_Weight_Round_Robin_Tasks(void);
 Task_Control_Block* Get_Earliest_Deadline_Task(void);	//获取EDF任务
 Task_Control_Block* Get_Current_Weight_Round_Robin_Task(void);	//获取W-R-R任务
 
+//MLFQ调度
+//任务优先级
+#define MLFQ_TASK_1_PRIORITY 1	
+#define MLFQ_TASK_2_PRIORITY 2			
+#define MLFQ_TASK_3_PRIORITY 3	
+//MLFQ的优先级队列，标号越小优先级越低
+#define Q3_TIME_SLICES 2	
+#define Q2_TIME_SLICES 4
+#define Q1_TIME_SLICES 8	
+QueueHandle_t Q3, Q2, Q1;	//多级队列
+TaskHandle_t MLFQ_Scheduler_Handle;	//MLFQ调度器句柄
+void Initialize_MLFQ_Tasks(void);		//初始化调度任务
+void MLFQ_Scheduler(void *pvParameters);	//MLFQ调度器	
+void MLFQ_TASK_1(void *pvParameters);
+void MLFQ_TASK_2(void *pvParameters);
+void MLFQ_TASK_3(void *pvParameters);
+void Task_Visualization(int task_id);
+void show_current_time_on_lcd(void);
+int lcd_discolor[3]={ RED, GREEN, YELLOW };
+
+/* MLFQ调度 */
+void Initialize_MLFQ_Tasks(void){
+	int i;
+	int test_id = 0;
+	current_task_count = 3;	//总任务数
+	for(i=0;i<current_task_count;i++){	//初始化任务标记
+		arrived_tasks[i] = 0;
+	}
+	Q3 = xQueueCreate(MAX_TASKS, sizeof(int));	
+	Q2 = xQueueCreate(MAX_TASKS, sizeof(int));	
+	Q1 = xQueueCreate(MAX_TASKS, sizeof(int));	
+	
+	if(test_id == 0){
+		tasks[0].arrival_time = 0*TIME_SLICE_INTERVAL;
+		tasks[0].execution_time = 3*TIME_SLICE_INTERVAL;
+		tasks[0].weight = 1;
+		tasks[0].ID = 1;
+
+		tasks[1].arrival_time = 1*TIME_SLICE_INTERVAL;
+		tasks[1].execution_time = 2*TIME_SLICE_INTERVAL;
+		tasks[1].weight = 1;
+		tasks[1].ID = 2;
+		
+		tasks[2].arrival_time = 3*TIME_SLICE_INTERVAL;
+		tasks[2].execution_time = 1*TIME_SLICE_INTERVAL;
+		tasks[2].weight = 1;
+		tasks[2].ID = 3;		
+	}
+}
+
+void Task_Visualization(int task_id){
+	int i = 1;
+	char str[10];
+	POINT_COLOR = BLACK;
+	sprintf(str, "task%d", task_id);
+	LCD_DrawRectangle(5+i*150,110,115+i*150,314); 	//画一个矩形	
+	LCD_ShowString(40+i*150,350,60,16,16,(u8*)str);
+	LCD_Fill(6+i*150,111,114+i*150,313,lcd_discolor[task_id % 3]); //填充
+	if(tasks[task_id - 1].execution_time != 0){
+		printf("T%d: task%d is running. \r\n", current_time/TIME_SLICE_INTERVAL, task_id);
+	}else{
+		printf("T%d: task%d is finished. \r\n", current_time/TIME_SLICE_INTERVAL, task_id);
+	}
+}
+
+void show_current_time_on_lcd(void){
+	LCD_ShowString(150,700,110,16,16,(u8*)"current time");
+	LCD_ShowxNum(250,700,current_time/TIME_SLICE_INTERVAL,4,16,0x80);
+}
+
+void MLFQ_TASK_1(void *pvParameters){
+	while(1){
+		Task_Visualization(1);
+		show_current_time_on_lcd();
+		if(tasks[0].execution_time > 0){
+			tasks[0].execution_time -= TIME_SLICE_INTERVAL;
+		}
+		current_time += TIME_SLICE_INTERVAL;
+		vTaskDelay(TIME_SLICE_INTERVAL);
+	}
+}
+void MLFQ_TASK_2(void *pvParameters){
+	while(1){
+		Task_Visualization(2);
+		show_current_time_on_lcd();
+		if(tasks[1].execution_time > 0){
+			tasks[1].execution_time -= TIME_SLICE_INTERVAL;
+		}
+		current_time += TIME_SLICE_INTERVAL;
+		vTaskDelay(TIME_SLICE_INTERVAL);
+	}
+}
+void MLFQ_TASK_3(void *pvParameters){
+	while(1){
+		Task_Visualization(3);
+		show_current_time_on_lcd();
+		if(tasks[2].execution_time > 0){
+			tasks[2].execution_time -= TIME_SLICE_INTERVAL;
+		}
+		current_time += TIME_SLICE_INTERVAL;
+		vTaskDelay(TIME_SLICE_INTERVAL);
+	}
+}
+//1. 任务进入后放置到最高优先级队列Q3中
+//2. 若任务在用完队列给定的时间片仍未执行结束，则置入下一个队列中
+//3. 若任务在最低优先级的队列中，使用时间片轮转
+//4. 在特定时间后，将所有任务放入最高优先级的队列中
+void MLFQ_Scheduler(void *pvParameters){
+	int i;
+	int task_index;	//任务在数组中的序号
+	int current_task_index;
+	int temp;
+	while (1) {
+		show_current_time_on_lcd();
+		//每个时间片开始前挂起所有任务
+		for(i=0;i<current_task_count;i++){	
+			vTaskSuspend(tasks[i].task_handle);
+		}
+		//任务到达后进入最高优先级队列
+		for(i=0;i<current_task_count;i++){	
+			if(arrived_tasks[i] == 0 && tasks[i].arrival_time <= current_time){
+				task_index = i;
+				if(xQueueSendToBack(Q3, &task_index, portMAX_DELAY) == pdPASS){
+					arrived_tasks[i] = 1;
+					printf("T%d: task%d in. \r\n", current_time/TIME_SLICE_INTERVAL, tasks[i].ID);
+				}else{
+					printf("Failed to enqueue task. \r\n");
+				}
+			}
+		}
+		if(uxQueueMessagesWaiting(Q3) != 0  ){
+			if (xQueueReceive(Q3, &current_task_index, portMAX_DELAY) == pdPASS) {
+				printf("Q3 runs task%d! \r\n", current_task_index + 1);
+				if (tasks[current_task_index].execution_time > 0) {
+					vTaskResume(tasks[current_task_index].task_handle);
+					temp = tasks[current_task_index].execution_time - Q3_TIME_SLICES * TIME_SLICE_INTERVAL;
+					if(temp > 0){
+						if(xQueueSendToBack(Q2, &current_task_index, portMAX_DELAY) == pdPASS){
+							printf("task%d will be down to Q2. \r\n", current_task_index + 1);
+						}
+					}
+				}
+				vTaskDelay(Q3_TIME_SLICES * TIME_SLICE_INTERVAL);
+			}
+		}else if(uxQueueMessagesWaiting(Q2) != 0){
+			if(xQueueReceive(Q2, &current_task_index, portMAX_DELAY) == pdPASS){
+				printf("Q2 runs task%d! \r\n", current_task_index + 1);
+				if (tasks[current_task_index].execution_time > 0) {
+					vTaskResume(tasks[current_task_index].task_handle);
+					temp = tasks[current_task_index].execution_time - Q2_TIME_SLICES * TIME_SLICE_INTERVAL;
+					if(temp > 0){
+						if(xQueueSendToBack(Q2, &current_task_index, portMAX_DELAY) == pdPASS){
+							printf("task%d will be down to Q1. \r\n", current_task_index + 1);
+						}
+					}
+				}
+				vTaskDelay(Q2_TIME_SLICES * TIME_SLICE_INTERVAL);
+			}
+		}else if(uxQueueMessagesWaiting(Q1) != 0){
+			if(xQueueReceive(Q1, &current_task_index, portMAX_DELAY) == pdPASS){
+				printf("Q1 runs task%d! \r\n", current_task_index + 1);
+				if (tasks[current_task_index].execution_time > 0) {
+					vTaskResume(tasks[current_task_index].task_handle);
+					temp = tasks[current_task_index].execution_time - Q1_TIME_SLICES * TIME_SLICE_INTERVAL;
+					if(temp > 0){
+						if(xQueueSendToBack(Q2, &current_task_index, portMAX_DELAY) == pdPASS){
+							printf("task%d in Q1 again. \r\n", current_task_index + 1);
+						}
+					}
+				}
+				vTaskDelay(Q1_TIME_SLICES * TIME_SLICE_INTERVAL);
+			}
+		}else{
+			printf("No task in queue! \r\n");
+			current_time += TIME_SLICE_INTERVAL;
+			show_current_time_on_lcd();
+			vTaskDelay(TIME_SLICE_INTERVAL);			
+		}
+	}
+}
+
+/***********************************************************/
 void TASK_1(void *pvParameters)
 {
 	int task_index = 0;
@@ -70,6 +251,7 @@ void TASK_1(void *pvParameters)
 	int endFlag = TASK_END;
 	while(1)
 	{
+		show_current_time_on_lcd();
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
@@ -78,6 +260,7 @@ void TASK_1(void *pvParameters)
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 		}
 		if(scheduling_id == 3 || scheduling_id == 4){
+			Task_Visualization(task_index+1);
 			//执行完毕后剩余的时间片空转
 			if(tasks[task_index].execution_time != 0){
 				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
@@ -113,6 +296,7 @@ void TASK_2(void *pvParameters)
 	int endFlag = TASK_END;
 	while(1)
 	{
+		show_current_time_on_lcd();
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
@@ -121,6 +305,7 @@ void TASK_2(void *pvParameters)
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 		}
 		if(scheduling_id == 3 || scheduling_id == 4){
+			Task_Visualization(task_index+1);
 			//执行完毕后剩余的时间片空转
 			if(tasks[task_index].execution_time != 0){
 				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
@@ -156,6 +341,7 @@ void TASK_3(void *pvParameters)
 	int endFlag = TASK_END;
 	while(1)
 	{
+		show_current_time_on_lcd();
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
@@ -165,6 +351,7 @@ void TASK_3(void *pvParameters)
 		}
 		if(scheduling_id == 3 || scheduling_id == 4){
 			//执行完毕后剩余的时间片空转
+			Task_Visualization(task_index+1);
 			if(tasks[task_index].execution_time != 0){
 				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
 				printf("T%d: task%d, remains %d \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1, tasks[task_index].execution_time);
@@ -182,6 +369,7 @@ void TASK_3(void *pvParameters)
 				}
 			}else{
 				//vTaskDelete(tasks[0].task_handle);
+				Task_Visualization(task_index+1);
 				printf("T%d task%d is end. \r\n", current_time/TIME_SLICE_INTERVAL, 3);
 				xQueueSendToBack(task_Queue, &endFlag, portMAX_DELAY);
 				//break;
@@ -231,7 +419,7 @@ void EDF_Scheduler(void *pvParameters)
 //		LED0=!LED0;
     while (1) {
 			Task_Control_Block* task_to_execute = Get_Earliest_Deadline_Task();	//获取当前时间片拥有最近deadline的任务
-			
+			show_current_time_on_lcd();
 			//每个时间片开始前挂起所有任务
 			for(i=0;i<current_task_count;i++){	
 				vTaskSuspend(tasks[i].task_handle);
@@ -291,8 +479,7 @@ void Weighted_Round_Robin_Scheduler(void *pvParameters){
 	int front_task_index;
 	int task_weight;
 	while (1) {
-		LCD_ShowString(150,700,110,16,16,(u8*)"current time");
-		LCD_ShowxNum(250,700,current_time/TIME_SLICE_INTERVAL,4,16,0x80);
+		show_current_time_on_lcd();
 		//每个时间片开始前挂起所有任务
 		for(i=0;i<current_task_count;i++){	
 			vTaskSuspend(tasks[i].task_handle);
@@ -300,7 +487,7 @@ void Weighted_Round_Robin_Scheduler(void *pvParameters){
 		//将已到达的任务入队,每个任务仅进行一次操作
 		for(i=0;i<current_task_count;i++){	
 //			printf("a:%d at:%d\r\n",arrived_tasks[i],tasks[i].arrival_time);
-			if(arrived_tasks[i] == 0 && tasks[i].arrival_time >= current_time){
+			if(arrived_tasks[i] == 0 && tasks[i].arrival_time <= current_time){
 				task_index = i;
 				if(xQueueSendToBack(task_Queue, &task_index, portMAX_DELAY) == pdPASS){
 					arrived_tasks[i] = 1;
@@ -339,7 +526,6 @@ void Weighted_Round_Robin_Scheduler(void *pvParameters){
 		}
 	}	
 }
-
 
 //定义任务控制块
 void Initialize_Preemptive_Priority_Tasks(void){
@@ -410,13 +596,15 @@ void Initialize_Weight_Round_Robin_Tasks(void){
 	tasks[0].weight = 1;
 	tasks[0].ID = 1;
 
-	tasks[1].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[1].execution_time = 50*TIME_SLICE_INTERVAL;
+
+	tasks[1].arrival_time = 2*TIME_SLICE_INTERVAL;
+	tasks[1].execution_time = 5*TIME_SLICE_INTERVAL;
 	tasks[1].weight = 2;
 	tasks[1].ID = 2;
 
-	tasks[2].arrival_time = 0*TIME_SLICE_INTERVAL;
-	tasks[2].execution_time = 80*TIME_SLICE_INTERVAL;
+	tasks[2].arrival_time = 4*TIME_SLICE_INTERVAL;
+	tasks[2].execution_time = 8*TIME_SLICE_INTERVAL;
+
 	tasks[2].weight = 3;
 	tasks[2].ID = 3;
 }
@@ -436,11 +624,20 @@ int main(void)
 	LCD_ShowString(30,10,300,48,24,"RTOS TEST");
 	
 	//选择调度策略: 1-5分别为抢占式优先级调度，抢占式EDF调度，Round-Robin调度，Weight-Round-Robin调度，MLFQ调度
-	scheduling_id = 2;
+
+
+	scheduling_id = 5;
+	if(scheduling_id != 5){
+		xTaskCreate(TASK_1, "Task1", configMINIMAL_STACK_SIZE, NULL, TASK1_PRIORITY, &tasks[0].task_handle);
+		xTaskCreate(TASK_2, "Task2", configMINIMAL_STACK_SIZE, NULL, TASK2_PRIORITY, &tasks[1].task_handle);
+		xTaskCreate(TASK_3, "Task3", configMINIMAL_STACK_SIZE, NULL, TASK3_PRIORITY, &tasks[2].task_handle);
+	}else if(scheduling_id == 5){
+		xTaskCreate(MLFQ_TASK_1, "MLFQ_TASK_1", configMINIMAL_STACK_SIZE, NULL, 1, &tasks[0].task_handle);
+		xTaskCreate(MLFQ_TASK_2, "MLFQ_TASK_2", configMINIMAL_STACK_SIZE, NULL, 2, &tasks[1].task_handle);
+		xTaskCreate(MLFQ_TASK_3, "MLFQ_TASK_3", configMINIMAL_STACK_SIZE, NULL, 3, &tasks[2].task_handle);
+	}
+
 	
-	xTaskCreate(TASK_1, "Task1", configMINIMAL_STACK_SIZE, NULL, TASK1_PRIORITY, &tasks[0].task_handle);
-	xTaskCreate(TASK_2, "Task2", configMINIMAL_STACK_SIZE, NULL, TASK2_PRIORITY, &tasks[1].task_handle);
-	xTaskCreate(TASK_3, "Task3", configMINIMAL_STACK_SIZE, NULL, TASK3_PRIORITY, &tasks[2].task_handle);
 	//选择调度策略
 	if(scheduling_id == 1){	//抢占式调度（默认）
 		Initialize_EDF_Tasks();
@@ -466,6 +663,9 @@ int main(void)
 			printf("Queue creation successed!\r\n");
 		}
 		xTaskCreate(Weighted_Round_Robin_Scheduler, "Weighted_Round_Robin_Scheduler", configMINIMAL_STACK_SIZE, NULL, UINT32_MAX, Weighted_Round_Robin_Scheduler_Handle);
+	}else if(scheduling_id == 5){
+		Initialize_MLFQ_Tasks();
+		xTaskCreate(MLFQ_Scheduler, "MLFQ_Scheduler", configMINIMAL_STACK_SIZE, NULL, UINT32_MAX, MLFQ_Scheduler_Handle);
 	}
 	
 	//开启调度
