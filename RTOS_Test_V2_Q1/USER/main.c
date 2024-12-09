@@ -19,6 +19,7 @@
 //任务控制块		
 typedef struct{
 	uint32_t ID;	
+	uint32_t priority;
 	uint32_t arrival_time;	//到达时间
 	uint32_t execution_time;	//执行时间
 	uint32_t period;	//周期
@@ -432,22 +433,34 @@ void TASK_3(void *pvParameters)
 
 //抢占式优先级调度器
 void Preemptive_Priority_Scheduler(void *pvParameters){
-	int i = 0;
+	int i;
+	int current_task_id; 
+	int max_pri;
 	while(1){
+		current_task_id = 0; 
+		max_pri = 0;
 		for(i=0;i<current_task_count;i++){	
-			if(tasks[i].execution_time == 0){
-				vTaskSuspend(tasks[i].task_handle);
+			vTaskSuspend(tasks[i].task_handle);
+		}
+		for(i=0;i<current_task_count;i++){
+			if(max_pri < tasks[i].priority && tasks[i].execution_time != 0){
+				max_pri = tasks[i].priority;
+				current_task_id = i;
 			}
-		}	
+		}
+		if(tasks[current_task_id].execution_time != 0){
+			vTaskResume(tasks[current_task_id].task_handle);
+		}
+		vTaskDelay(TIME_SLICE_INTERVAL);
 	}
 }
 
 //Round-Robin调度器	
-void Round_Robin_Scheduler(void *pvParameters){
-	while(1){
-			
-	}
-}
+//void Round_Robin_Scheduler(void *pvParameters){
+//	while(1){
+//			
+//	}
+//}
 
 
 //获取拥有最早deadline的task
@@ -595,6 +608,7 @@ void Initialize_EDF_Tasks(void) {
 	tasks[0].period = 10*TIME_SLICE_INTERVAL;
 	tasks[0].deadline = 10*TIME_SLICE_INTERVAL;
 	tasks[0].ID = 1;
+	tasks[0].priority = 1;
 //		LCD_ShowString(350,100,110,16,16,(u8*)"task1");
 //		LCD_ShowxNum(400,100,tasks[0].execution_time,8,16,0x80);
 
@@ -603,6 +617,7 @@ void Initialize_EDF_Tasks(void) {
 	tasks[1].period = 10*TIME_SLICE_INTERVAL;
 	tasks[1].deadline = 14*TIME_SLICE_INTERVAL;
 	tasks[1].ID = 2;
+	tasks[1].priority = 2;
 //		LCD_ShowString(350,200,110,16,16,(u8*)"task2");
 //		LCD_ShowxNum(400,200,tasks[0].execution_time,8,16,0x80);
 
@@ -611,6 +626,7 @@ void Initialize_EDF_Tasks(void) {
 	tasks[2].period = 10*TIME_SLICE_INTERVAL;
 	tasks[2].deadline = 12*TIME_SLICE_INTERVAL;
 	tasks[2].ID = 3;
+	tasks[2].priority = 3;
 //		LCD_ShowString(350,300,110,16,16,(u8*)"task3");
 //		LCD_ShowxNum(400,300,tasks[0].execution_time,8,16,0x80);
 }
@@ -677,7 +693,7 @@ int main(void)
 	LCD_ShowString(30,10,300,48,24,"RTOS TEST");
 	
 	//选择调度策略: 1-5分别为抢占式优先级调度，抢占式EDF调度，Round-Robin调度，Weight-Round-Robin调度，MLFQ调度
-	scheduling_id = 5;
+	scheduling_id = 1;
 	if(scheduling_id != 5){
 		xTaskCreate(TASK_1, "Task1", configMINIMAL_STACK_SIZE, NULL, TASK1_PRIORITY, &tasks[0].task_handle);
 		xTaskCreate(TASK_2, "Task2", configMINIMAL_STACK_SIZE, NULL, TASK2_PRIORITY, &tasks[1].task_handle);
@@ -691,7 +707,7 @@ int main(void)
 	//选择调度策略
 	if(scheduling_id == 1){	//抢占式调度（默认）
 		Initialize_EDF_Tasks();
-		xTaskCreate(Preemptive_Priority_Scheduler, "Preemptive_Priority_Scheduler", configMINIMAL_STACK_SIZE, NULL, 0, Preemptive_Priority_Scheduler_Handle);
+		xTaskCreate(Preemptive_Priority_Scheduler, "Preemptive_Priority_Scheduler", configMINIMAL_STACK_SIZE, NULL, UINT32_MAX, Preemptive_Priority_Scheduler_Handle);
 	}else if(scheduling_id == 2){	//EDF调度
 		Initialize_EDF_Tasks();
 		xTaskCreate(EDF_Scheduler, "EDF_Scheduler", configMINIMAL_STACK_SIZE, NULL, UINT32_MAX, EDF_Scheduler_Handle);
