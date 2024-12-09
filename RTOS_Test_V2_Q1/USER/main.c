@@ -293,6 +293,10 @@ void TASK_1(void *pvParameters)
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
+			if(tasks[task_index].execution_time > 0){
+				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
+			}
+			vTaskDelay(TIME_SLICE_INTERVAL);
 		}
 		if(scheduling_id == 2){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
@@ -338,6 +342,10 @@ void TASK_2(void *pvParameters)
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
+			if(tasks[task_index].execution_time > 0){
+				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
+			}
+			vTaskDelay(TIME_SLICE_INTERVAL);
 		}
 		if(scheduling_id == 2){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
@@ -383,6 +391,10 @@ void TASK_3(void *pvParameters)
 		if(scheduling_id == 1){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
 			current_time += TIME_SLICE_INTERVAL;
+			if(tasks[task_index].execution_time > 0){
+				tasks[task_index].execution_time -= TIME_SLICE_INTERVAL;
+			}
+			vTaskDelay(TIME_SLICE_INTERVAL);
 		}
 		if(scheduling_id == 2){
 			printf("T%d: task%d  \r\n", current_time/TIME_SLICE_INTERVAL, task_index+1);
@@ -420,8 +432,13 @@ void TASK_3(void *pvParameters)
 
 //抢占式优先级调度器
 void Preemptive_Priority_Scheduler(void *pvParameters){
+	int i = 0;
 	while(1){
-		
+		for(i=0;i<current_task_count;i++){	
+			if(tasks[i].execution_time == 0){
+				vTaskSuspend(tasks[i].task_handle);
+			}
+		}	
 	}
 }
 
